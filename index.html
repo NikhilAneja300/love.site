@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Love Surprise 💖</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle, #111, #000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  #container {
+    text-align: center;
+    z-index: 10;
+  }
+
+  #btn {
+    padding: 15px 35px;
+    font-size: 22px;
+    border: none;
+    border-radius: 12px;
+    background: hotpink;
+    color: white;
+    cursor: pointer;
+  }
+
+  #message {
+    font-size: 48px;
+    color: #ffb6c1;
+    margin-top: 25px;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .balloon {
+    position: absolute;
+    bottom: -100px;
+    width: 40px;
+    height: 55px;
+    border-radius: 50%;
+    animation: floatUp linear forwards;
+  }
+
+  .balloon::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 35px;
+    background: white;
+    left: 50%;
+    top: 55px;
+  }
+
+  @keyframes floatUp {
+    to {
+      transform: translateY(-120vh);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div id="container">
+  <button id="btn">Click Me 💥</button>
+  <div id="message">I love you cutie 💖</div>
+</div>
+
+<script>
+  const btn = document.getElementById("btn");
+  const msg = document.getElementById("message");
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+
+  window.addEventListener("resize", () => {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+  });
+
+  // 🔊 AUDIO SYSTEM
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContext();
+
+  function playBoom() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+
+    gain.gain.setValueAtTime(1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioCtx.currentTime + 0.6
+    );
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.6);
+  }
+
+  function playSparkle() {
+    for (let i = 0; i < 4; i++) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(
+        600 + Math.random() * 800,
+        audioCtx.currentTime
+      );
+
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioCtx.currentTime + 0.25
+      );
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.25);
+    }
+  }
+
+  // 🎆 FIREWORKS
+  let particles = [];
+
+  function createFirework() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height / 2;
+
+    playBoom();
+    playSparkle();
+
+    for (let i = 0; i < 70; i++) {
+      particles.push({
+        x,
+        y,
+        angle: Math.random() * Math.PI * 2,
+        speed: Math.random() * 6 + 2,
+        life: 100,
+        color: `hsl(${Math.random() * 360},100%,60%)`
+      });
+    }
+  }
+
+  function animateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, i) => {
+      p.x += Math.cos(p.angle) * p.speed;
+      p.y += Math.sin(p.angle) * p.speed;
+      p.life--;
+
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (p.life <= 0) particles.splice(i, 1);
+    });
+
+    requestAnimationFrame(animateFireworks);
+  }
+
+  animateFireworks();
+
+  // 🎈 BALLOONS
+  function spawnBalloon() {
+    const balloon = document.createElement("div");
+    balloon.className = "balloon";
+    balloon.style.left = Math.random() * 100 + "vw";
+    balloon.style.background =
+      `hsl(${Math.random() * 360},80%,60%)`;
+
+    balloon.style.animationDuration =
+      Math.random() * 3 + 4 + "s";
+
+    document.body.appendChild(balloon);
+
+    setTimeout(() => balloon.remove(), 8000);
+  }
+
+  // 💘 CLICK EVENT
+  btn.addEventListener("click", () => {
+    audioCtx.resume(); // unlock audio
+
+    msg.style.opacity = 1;
+
+    for (let i = 0; i < 6; i++) {
+      setTimeout(createFirework, i * 500);
+    }
+
+    const balloonInterval = setInterval(spawnBalloon, 350);
+    setTimeout(() => clearInterval(balloonInterval), 6500);
+  });
+</script>
+
+</body>
+</html>
