@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Happy Rose Day 🌹</title>
+
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(to top, #ffb6c1, #ffe6ec);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  #container {
+    text-align: center;
+    z-index: 10;
+  }
+
+  #btn {
+    padding: 15px 35px;
+    font-size: 22px;
+    border: none;
+    border-radius: 12px;
+    background: crimson;
+    color: white;
+    cursor: pointer;
+  }
+
+  #message {
+    font-size: 46px;
+    color: #b00020;
+    margin-top: 25px;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    font-weight: bold;
+  }
+
+  .rose {
+    position: absolute;
+    top: -60px;
+    font-size: 36px;
+    animation: fall linear forwards;
+    pointer-events: none;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(120vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="container">
+  <button id="btn">Click Me 🌹</button>
+  <div id="message">Happy Rose Day babygurl 💖🌹</div>
+</div>
+
+<script>
+  const btn = document.getElementById("btn");
+  const msg = document.getElementById("message");
+
+  function spawnRose() {
+    const rose = document.createElement("div");
+    rose.className = "rose";
+    rose.innerText = "🌹";
+
+    rose.style.left = Math.random() * 100 + "vw";
+    rose.style.animationDuration =
+      Math.random() * 3 + 4 + "s";
+
+    rose.style.fontSize =
+      Math.random() * 20 + 25 + "px";
+
+    document.body.appendChild(rose);
+
+    setTimeout(() => rose.remove(), 8000);
+  }
+
+  btn.addEventListener("click", () => {
+    msg.style.opacity = 1;
+
+    const rain = setInterval(spawnRose, 150);
+
+    setTimeout(() => clearInterval(rain), 7000);
+  });
+</script>
+
+</body>
+</html>
+
 
